@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Christmas Countdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #e00000;
+            color: white;
+            text-align: center;
+            margin-top: 0;
+            padding-top: 100px;
+            overflow: hidden;
+            height: 100vh;
+        }
+        h1 {
+            font-size: 30px;
+            margin-top: 20px;
+            z-index: 10;
+            position: relative;
+        }
+        #countdown {
+            font-size: 30px;
+            margin-top: 20px;
+            z-index: 10;
+            position: relative;
+        }
+
+        /*Snowflakes*/
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            user-select: none;
+            pointer-events: none;
+            animation-name: fall;
+            animation-timing-function: linear;
+        }
+
+        @keyframes fall {
+            0% {transform: translateY(-10px); }
+            100% {transform: translateY(100vh); }
+        }
+
+        /*snow pile container*/
+        #snowPile {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            z-index: 1;
+        }
+
+        /*individual snow blobs*/
+        .snowBlob {
+            position: absolute;
+            bottom: 0;
+            background: white;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎄 Christmas Countdown 🎅</h1>
+<div id="countdown">Loading...</div>
+
+<div id="snowPile"></div>
+
+<script>
+    function updateCountdown(){
+        // Find current date and christmas
+        const now = new Date();
+        let year = now.getFullYear();
+        const christmas = new Date(year, 11, 25);
+        
+        // If christmas aready passed this year
+        if(now > christmas){
+            christmas.setFullYear(year + 1)
+        }  
+
+        // Find weeks, days, hours, minutes, and seconds until christmas
+        const diff = christmas - now;
+        const totalSeconds = Math.floor(diff / 1000);
+
+        const weeks = Math.floor(totalSeconds / (7 * 24 * 3600));
+        let remaining = totalSeconds % (7 * 24 * 3600);
+
+        const days = Math.floor(remaining / (24 * 3600));
+        remaining %= 24 * 3600;
+
+        const hours = Math.floor(remaining / 3600);
+        remaining %= 3600;
+
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+
+        document.getElementById("countdown").textContent = 
+            `Time Until Christmas: ${weeks} weeks, ${days} days, ` +
+            `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+    }    
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    //snowflake animation and pile script
+
+    let snowpile = document.createElement("div");
+    let currentPileHeight = 0;
+    const maxPileHeight = 200;
+
+    function createSnowflake() {
+        const snowflake = document.createElement("div");
+        snowflake.classList.add("snowflake");
+        snowflake.textContent = "❄";
+
+        // random horizontal position
+        snowflake.style.left = Math.random() * 100 + "vw";
+
+        // random size
+        snowflake.style.fontSize = (Math.random() * 10 + 10) + "px";
+
+        //random fall speed
+        const fallDuration = Math.random() *5 + 5;
+        snowflake.style.animationDuration = fallDuration + "s";
+
+        document.body.appendChild(snowflake);
+
+        //remove snowflake after it falls
+        setTimeout(() =>{
+            snowflake.remove();
+            //add to snow pile
+            createSnowBlob()
+        }, fallDuration * 1000);
+    }
+
+    function createSnowBlob() {
+        const blob = document.createElement("div")
+        blob.classList.add("snowBlob")
+
+        const blobSize = Math.random() * 20 + 10;
+        blob.style.width = blobSize + "px";
+        blob.style.height = blobSize + "px";
+
+        //random horizontal pile position
+        blob.style.left = Math.random() * (window.innerWidth - blobSize) + "px";
+
+        snowPile.appendChild(blob);
+
+        //slowly increase pile height
+        currentPileHeight += blobSize * 0.05;
+        snowPile.style.height = currentPileHeight + "px";
+    }
+
+    // create endless snowflakes
+    setInterval(createSnowflake, 200)
+</script>
+
+</body>
+</html>
